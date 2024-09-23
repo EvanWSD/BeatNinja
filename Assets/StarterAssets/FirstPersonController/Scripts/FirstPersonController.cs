@@ -32,6 +32,7 @@ namespace StarterAssets
 		public float JumpTimeout = 0.1f;
 		[Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
 		public float FallTimeout = 0.15f;
+		public float DoubleJumpTimeout = 0.5f;
 
 		[Header("Player Grounded")]
 		[Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -65,6 +66,7 @@ namespace StarterAssets
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
+		private float _doubleJumpTimeoutDelta;
 
 	
 #if ENABLE_INPUT_SYSTEM
@@ -202,7 +204,7 @@ namespace StarterAssets
 
 		private void JumpAndGravity()
 		{
-			if (Grounded)
+            if (Grounded)
 			{
 				_canDoubleJump = true;
 
@@ -219,31 +221,40 @@ namespace StarterAssets
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					DoJump();
-				}
+                    _doubleJumpTimeoutDelta = DoubleJumpTimeout;
+                }
 
-				// jump timeout
-				if (_jumpTimeoutDelta >= 0.0f)
-				{
-					_jumpTimeoutDelta -= Time.deltaTime;
-				}
-			}
+                // jump timeout
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
+                    _jumpTimeoutDelta -= Time.deltaTime;
+                }
+            }
 			else
 			{
 				// reset the jump timeout timer
 				_jumpTimeoutDelta = JumpTimeout;
 
-				// fall timeout
-				if (_fallTimeoutDelta >= 0.0f)
+                // doublejump timeout
+				if (_doubleJumpTimeoutDelta >= 0.0f)
+				{
+					_doubleJumpTimeoutDelta -= Time.deltaTime;
+				}
+
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
 				{
 					_fallTimeoutDelta -= Time.deltaTime;
 				}
 
-				if (_canDoubleJump && _input.jump && _jumpTimeoutDelta <= 0.0f)
+				// double jump
+				if (_input.jump && _doubleJumpTimeoutDelta <= 0 && _canDoubleJump)
 				{
-					Debug.Log("dj");
 					DoJump();
 					_canDoubleJump = false;
-				} else _input.jump = false;
+				}
+
+				_input.jump = false;
 			}
 
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)

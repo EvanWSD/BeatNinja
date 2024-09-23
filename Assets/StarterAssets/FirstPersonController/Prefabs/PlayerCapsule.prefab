@@ -218,10 +218,11 @@ MonoBehaviour:
   SprintSpeed: 6
   RotationSpeed: 1
   SpeedChangeRate: 10
-  JumpHeight: 1.2
-  Gravity: -15
+  JumpHeight: 2.5
+  Gravity: -25
   JumpTimeout: 0.1
   FallTimeout: 0.15
+  DoubleJumpTimeout: 0.5
   Grounded: 1
   GroundedOffset: -0.14
   GroundedRadius: 0.5
