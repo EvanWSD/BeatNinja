@@ -19,15 +19,11 @@ public class Hitscan : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, maxDist))
         {
-            if (hit.collider.gameObject.CompareTag("TargetButton")) {
+            if (hit.collider.GetComponent(typeof(MonoBehaviour)) is IShootable shootable) {
                 reticleImg.color = Color.red;
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Material mat = hit.collider.GetComponent<MeshRenderer>().material;
-                    float r = Random.Range(0, 100f) / 100f;
-                    float g = Random.Range(0, 100f) / 100f;
-                    float b = Random.Range(0, 100f) / 100f;
-                    mat.color = new Color(r, g, b); 
+                    shootable.OnShot.Invoke();
                 }
             }
         }
