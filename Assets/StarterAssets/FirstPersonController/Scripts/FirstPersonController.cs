@@ -1,7 +1,15 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+
+public enum PlayerState
+{
+    idle,
+    dashing,
+    halted,
+}
 
 namespace StarterAssets
 {
@@ -9,6 +17,8 @@ namespace StarterAssets
 #if ENABLE_INPUT_SYSTEM
 	[RequireComponent(typeof(PlayerInput))]
 #endif
+
+
 	public class FirstPersonController : MonoBehaviour
 	{
 		[Header("Player")]
@@ -21,11 +31,14 @@ namespace StarterAssets
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
 
+
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
+		float DefaultJumpHeight;
 		[Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
 		public float Gravity = -15.0f;
+		float DefaultPlayerGravity;
 
 		[Space(10)]
 		[Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
@@ -68,6 +81,14 @@ namespace StarterAssets
 		private float _fallTimeoutDelta;
 		private float _doubleJumpTimeoutDelta;
 
+		// dash
+		private float isDashing;
+		private float dashSpeed;
+		private Vector3 dashDir;
+
+		// state 
+		private PlayerState state;
+
 	
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
@@ -75,8 +96,6 @@ namespace StarterAssets
 		private CharacterController _controller;
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
-
-		private const float _threshold = 0.01f;
 
 		private bool IsCurrentDeviceMouse
 		{
@@ -97,6 +116,8 @@ namespace StarterAssets
 			{
 				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
+
+			state = PlayerState.idle;
 		}
 
 		private void Start()
@@ -112,13 +133,28 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+
+			DefaultPlayerGravity = Gravity;
+			DefaultJumpHeight = JumpHeight;
 		}
 
 		private void Update()
 		{
-			JumpAndGravity();
-			GroundedCheck();
-			Move();
+			switch (state)
+			{
+				case PlayerState.idle:
+					DashCheck();
+                    JumpAndGravity();
+                    GroundedCheck();
+                    Move();
+					break;
+				case PlayerState.dashing:
+					break;
+            }
+
+			Debug.Log(Gravity);
+
+
 		}
 
 		private void LateUpdate()
@@ -126,80 +162,9 @@ namespace StarterAssets
 			CameraRotation();
 		}
 
-		private void GroundedCheck()
+		private void DashCheck()
 		{
-			// set sphere position, with offset
-			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-		}
-
-		private void CameraRotation()
-		{
-			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
-			{
-				//Don't multiply mouse input by Time.deltaTime
-				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
-
-				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
-
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
-
-				// rotate the player left and right
-				transform.Rotate(Vector3.up * _rotationVelocity);
-			}
-		}
-
-		private void Move()
-		{
-			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
-			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is no input, set the target speed to 0
-			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
-
-			// a reference to the players current horizontal velocity
-			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
-			float speedOffset = 0.1f;
-			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
-
-			// accelerate or decelerate to target speed
-			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
-			{
-				// creates curved result rather than a linear one giving a more organic speed change
-				// note T in Lerp is clamped, so we don't need to clamp our speed
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-
-				// round speed to 3 decimal places
-				_speed = Mathf.Round(_speed * 1000f) / 1000f;
-			}
-			else
-			{
-				_speed = targetSpeed;
-			}
-
-			// normalise input direction
-			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
-			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is a move input rotate player when the player is moving
-			if (_input.move != Vector2.zero)
-			{
-				// move
-				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
-			}
-
-			// move the player
-			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			// TODO
 		}
 
 		private void JumpAndGravity()
@@ -263,12 +228,92 @@ namespace StarterAssets
 				_verticalVelocity += Gravity * Time.deltaTime;
 			}
 		}
+		private void GroundedCheck()
+		{
+			// set sphere position, with offset
+			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+		}
+		private void Move()
+		{
+			// set target speed based on move speed, sprint speed and if sprint is pressed
+			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+
+			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
+
+			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+			// if there is no input, set the target speed to 0
+			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+
+			// a reference to the players current horizontal velocity
+			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+
+			float speedOffset = 0.1f;
+			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+
+			// accelerate or decelerate to target speed
+			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
+			{
+				// creates curved result rather than a linear one giving a more organic speed change
+				// note T in Lerp is clamped, so we don't need to clamp our speed
+				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
+
+				// round speed to 3 decimal places
+				_speed = Mathf.Round(_speed * 1000f) / 1000f;
+			}
+			else
+			{
+				_speed = targetSpeed;
+			}
+
+			// normalise input direction
+			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+
+			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+			// if there is a move input rotate player when the player is moving
+			if (_input.move != Vector2.zero)
+			{
+				// move
+				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
+			}
+
+			// move the player
+			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+		}
+
+		private void CameraRotation()
+		{
+			// if there is an input
+			if (_input.look.sqrMagnitude > 0)
+			{
+				//Don't multiply mouse input by Time.deltaTime
+				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+				
+				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
+				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+
+				// clamp our pitch rotation
+				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+
+				// Update Cinemachine camera target pitch
+				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+
+				// rotate the player left and right
+				transform.Rotate(Vector3.up * _rotationVelocity);
+			}
+		}
 
 		void DoJump()
 		{
             // the square root of H * -2 * G = how much velocity needed to reach desired height
             _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
         }
+
+		public void SetPlayerGravityMult(float mult)
+		{
+			Gravity = DefaultPlayerGravity * mult;
+			JumpHeight = DefaultJumpHeight / mult;
+		}
 
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 		{
