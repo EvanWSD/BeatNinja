@@ -12,7 +12,7 @@ public class BeatManager : MonoBehaviour
 
     // For keeping time with the bpm
     float speedMult = 1f;
-    float beatNum = 1;
+    public static float beatNum = 1;
     float timeSinceLastBeat = 0f;
     public float secsPerQuestion { get; private set; }
     const float syncFix = 0.1f; // AudioSources in Unity have a slight unavoidable delay

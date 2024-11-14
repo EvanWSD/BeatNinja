@@ -1,4 +1,5 @@
 ﻿using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -23,13 +24,13 @@ namespace StarterAssets
 	{
 		[Header("Player")]
 		[Tooltip("Move speed of the character in m/s")]
-		public float MoveSpeed = 4.0f;
+		public float MoveSpeed = 20f;
 		[Tooltip("Sprint speed of the character in m/s")]
 		public float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
 		public float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
-		public float SpeedChangeRate = 10.0f;
+		public float SpeedChangeRate = 5.0f;
 
 
 		[Space(10)]
@@ -83,8 +84,13 @@ namespace StarterAssets
 
 		// dash
 		private float isDashing;
-		private float dashSpeed;
+		private float dashSpeed = 20f;
 		private Vector3 dashDir;
+		private float maxDashTime=0.5f;
+		private float currDashDuration=0f;
+		private float goodDashImpulseMag = 2f;
+		[SerializeField] private DashManager dashManager;
+		
 
 		// state 
 		private PlayerState state;
@@ -136,6 +142,8 @@ namespace StarterAssets
 
 			DefaultPlayerGravity = Gravity;
 			DefaultJumpHeight = JumpHeight;
+
+			dashManager.OnGoodDash.AddListener(() => EndDash(true));
 		}
 
 		private void Update()
@@ -143,18 +151,16 @@ namespace StarterAssets
 			switch (state)
 			{
 				case PlayerState.idle:
-					DashCheck();
+					AbilityCheck();
                     JumpAndGravity();
                     GroundedCheck();
                     Move();
 					break;
 				case PlayerState.dashing:
+					MoveInDash();
+					CheckDashDuration();
 					break;
-            }
-
-			Debug.Log(Gravity);
-
-
+			}
 		}
 
 		private void LateUpdate()
@@ -162,9 +168,41 @@ namespace StarterAssets
 			CameraRotation();
 		}
 
-		private void DashCheck()
+		void AbilityCheck()
 		{
-			// TODO
+			if (Input.GetKeyDown(KeyCode.LeftShift))
+			{
+				state = PlayerState.dashing;
+				BeginDash();
+			}
+		}
+
+		void BeginDash()
+		{
+			dashDir = Camera.main.transform.forward;
+		}
+
+		void MoveInDash()
+		{
+			transform.position += dashDir * dashSpeed * Time.deltaTime;
+		}
+
+		void CheckDashDuration()
+		{
+			currDashDuration += Time.deltaTime;
+            if (currDashDuration > maxDashTime)
+			{
+				EndDash(false);
+			}
+        }
+
+		void EndDash(bool hitValidTarget)
+		{
+			state = PlayerState.idle;
+			if (hitValidTarget)
+			{
+				_controller.Move(Vector3.up * goodDashImpulseMag);
+			}
 		}
 
 		private void JumpAndGravity()
@@ -239,26 +277,15 @@ namespace StarterAssets
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
-			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is no input, set the target speed to 0
 			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
-
-			// a reference to the players current horizontal velocity
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
 			float speedOffset = 0.1f;
 			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
 			// accelerate or decelerate to target speed
 			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
 			{
-				// creates curved result rather than a linear one giving a more organic speed change
-				// note T in Lerp is clamped, so we don't need to clamp our speed
 				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-
-				// round speed to 3 decimal places
 				_speed = Mathf.Round(_speed * 1000f) / 1000f;
 			}
 			else
@@ -266,20 +293,15 @@ namespace StarterAssets
 				_speed = targetSpeed;
 			}
 
-			// normalise input direction
 			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
-			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is a move input rotate player when the player is moving
 			if (_input.move != Vector2.zero)
 			{
-				// move
 				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
 			}
 
-			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-		}
+		} 
 
 		private void CameraRotation()
 		{
