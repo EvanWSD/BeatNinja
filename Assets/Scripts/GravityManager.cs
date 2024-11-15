@@ -53,7 +53,6 @@ public class GravityManager : MonoBehaviour
                 break;
         }
         Physics.gravity = Vector3.down * g * gravMult;
-        player.SetPlayerGravityMult(gravMult);
     }
 
     private void Update()

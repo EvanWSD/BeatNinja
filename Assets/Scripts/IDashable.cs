@@ -5,7 +5,8 @@ using UnityEngine.Events;
 
 // idk could be used to detect special object being shot
 [RequireComponent(typeof(Collider))]
-public class IShootable : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class IDashable : MonoBehaviour
 {
-    public UnityEvent OnShot;
+    public UnityEvent OnDashedInto;
 }

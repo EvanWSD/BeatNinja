@@ -7,7 +7,7 @@ public enum ShootState
     OnCooldown,
 }
 
-public class ShooterEnemy : MonoBehaviour
+public class ShooterEnemy : IDashable
 {
     GameObject player;
     [SerializeField]
@@ -33,10 +33,15 @@ public class ShooterEnemy : MonoBehaviour
         {
             if (BeatManager.beatNum % 4 == 0 && PlayerInDetectionRange() && CanSeePlayer())
             {
-                Shoot(player.transform, Vector3.up);
+                Shoot(player.transform);
                 shootState = ShootState.OnCooldown;
                 ResetShootCooldown();
             }
+        });
+
+        OnDashedInto.AddListener(() =>
+        {
+            Destroy(gameObject);
         });
     }
 
