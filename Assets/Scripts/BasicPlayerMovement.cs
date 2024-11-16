@@ -28,6 +28,11 @@ public class BasicPlayerMovement : MonoBehaviour
     float currDashDuration = 0f;
     float goodDashImpulseMag = 10f;
 
+    // double jump
+    bool doubleJumpAvailable;
+    float doubleJumpTimerMax = 0.1f;
+    float doubleJumpTimer;
+
     // sliding
     [SerializeField] Collider col;
     [SerializeField] PhysicMaterial defaultPMat;
@@ -89,8 +94,16 @@ public class BasicPlayerMovement : MonoBehaviour
     void EndDash(bool hitValidTarget)
     {
         isDashing = false;
-        dashHb.enabled = false; 
-        v.y = hitValidTarget ? goodDashImpulseMag : 0f;
+        dashHb.enabled = false;
+        if (hitValidTarget)
+        {
+            v.y = goodDashImpulseMag;
+            doubleJumpAvailable = true;
+            doubleJumpTimer = doubleJumpTimerMax;
+        } else
+        {
+            v.y = 0f;
+        }
     }
 
     void ChangePhysicsMaterial()
@@ -118,11 +131,36 @@ public class BasicPlayerMovement : MonoBehaviour
         // jump
         if (isGrounded && jumpInp)
         {
-            v.y = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+            DoJump();
+            doubleJumpTimer = doubleJumpTimerMax;
+        }
+
+        // double jump + delay
+        if (isGrounded)
+        {
+            doubleJumpAvailable = true;
+        }
+        else // in air
+        {
+            if (doubleJumpAvailable)
+            {
+                doubleJumpTimer -= Time.deltaTime;
+                if (jumpInp && doubleJumpTimer <= 0)
+                {
+                    Debug.Log("double jump???");
+                    DoJump();
+                    doubleJumpAvailable = false;
+                }
+            }
         }
 
         // physics influence
         v.y += Physics.gravity.y * Time.deltaTime;
         cc.Move(v * Time.deltaTime);
+    }
+
+    void DoJump()
+    {
+        v.y = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
     }
 }
