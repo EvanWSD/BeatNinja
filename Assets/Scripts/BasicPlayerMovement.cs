@@ -37,6 +37,8 @@ public class BasicPlayerMovement : MonoBehaviour
     [SerializeField] Collider col;
     [SerializeField] PhysicMaterial defaultPMat;
     [SerializeField] PhysicMaterial slidePMat;
+    bool isSliding;
+    Vector3 currSlideVelocity;
 
     private void Start()
     {
@@ -49,13 +51,13 @@ public class BasicPlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        CheckGrounded();
         if (isDashing)
         {
             MoveInDash();
             CheckDashDuration();
             return;
         }
-        CheckGrounded();
         MoveCharacter(playerInput.moveInp, playerInput.jumpInp);
         AbilityCheck();
         ChangePhysicsMaterial();
@@ -100,9 +102,17 @@ public class BasicPlayerMovement : MonoBehaviour
             v.y = goodDashImpulseMag;
             doubleJumpAvailable = true;
             doubleJumpTimer = doubleJumpTimerMax;
-        } else
+        }
+        else
         {
-            v.y = 0f;
+            if (isGrounded && Input.GetKey(KeyCode.C))
+            {
+                isSliding = true;
+                currSlideVelocity = dashDir * dashSpeed / 4f;
+                currSlideVelocity.y = 0f;
+                v = currSlideVelocity;
+            }
+            v.y = 0;
         }
     }
 
@@ -126,7 +136,10 @@ public class BasicPlayerMovement : MonoBehaviour
 
         // input influence
         Vector3 moveDir = transform.right * moveInp.x + transform.forward * moveInp.z;
-        cc.Move(moveDir * moveSpeed * Time.deltaTime);
+        if (!isSliding)
+        {
+            cc.Move(moveDir * moveSpeed * Time.deltaTime);
+        };
 
         // jump
         if (isGrounded && jumpInp)
@@ -147,11 +160,16 @@ public class BasicPlayerMovement : MonoBehaviour
                 doubleJumpTimer -= Time.deltaTime;
                 if (jumpInp && doubleJumpTimer <= 0)
                 {
-                    Debug.Log("double jump???");
                     DoJump();
                     doubleJumpAvailable = false;
                 }
             }
+        }
+
+        if (isSliding && Input.GetKeyUp(KeyCode.C))
+        {
+            isSliding = false;
+            v -= currSlideVelocity;
         }
 
         // physics influence
