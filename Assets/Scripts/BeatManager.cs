@@ -34,7 +34,6 @@ public class BeatManager : MonoBehaviour
         OnBeat.AddListener(() => { 
             beatNum++;
             timeOfLastBeat = GetMusicTimeElapsed();
-            beatNumLerp = beatNum + currentBeatProgress01;
         });
     }
 
@@ -44,11 +43,14 @@ public class BeatManager : MonoBehaviour
         // invokes OnBeat in time with the music
         // timeSinceLastBeat = (musicSource.time - syncFix) / beatNum;
         currentBeatProgress01 = timeSinceLastBeat / secsPerBeat;
+        beatNumLerp = beatNum + currentBeatProgress01;
         timeSinceLastBeat = GetMusicTimeElapsed() - timeOfLastBeat;
         if (timeSinceLastBeat >= secsPerBeat)
         {
             OnBeat.Invoke();
         }
+
+        CanvasDebugText.Write(beatNum, "beatNum");
     }
 
     // used to gauge whether inputs are done in time with the music
