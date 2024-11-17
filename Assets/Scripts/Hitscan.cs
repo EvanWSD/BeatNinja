@@ -2,6 +2,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+// unused, might reuse for basic interactables eg elevator button
+
 public class Hitscan : MonoBehaviour
 {
     float maxDist = 100f;

@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,37 +11,57 @@ public class BeatManager : MonoBehaviour
 
     [SerializeField] AudioSource musicSource;
 
+    [Tooltip("+- beat progression for which timed inputs count as 'pressed on a beat'")]
+    [SerializeField] float validBeatInputVariance = 0.2f;
+
     // For keeping time with the bpm
     float speedMult = 1f;
     public static float beatNum = 1;
+    public static float beatNumLerp;
+    public static float currentBeatProgress01;
     float timeSinceLastBeat = 0f;
-    public float secsPerQuestion { get; private set; }
+    float timeOfLastBeat=0f;
+    public float secsPerBeat { get; private set; }
     const float syncFix = 0.1f; // AudioSources in Unity have a slight unavoidable delay
+    
 
     // call from other scripts
     public UnityEvent OnBeat = new UnityEvent();
 
-
-
     void Start()
     {
-        secsPerQuestion = CalcSecsPerQuestion();
-        OnBeat.AddListener(() => beatNum++);
+        secsPerBeat = CalcSecsPerBeat();
+        OnBeat.AddListener(() => { 
+            beatNum++;
+            timeOfLastBeat = GetMusicTimeElapsed();
+            beatNumLerp = beatNum + currentBeatProgress01;
+        });
     }
 
     // executes before all other Update methods.
     void Update()
     {
         // invokes OnBeat in time with the music
-        timeSinceLastBeat = (musicSource.time - syncFix) / beatNum;
-        if (timeSinceLastBeat >= secsPerQuestion)
+        // timeSinceLastBeat = (musicSource.time - syncFix) / beatNum;
+        currentBeatProgress01 = timeSinceLastBeat / secsPerBeat;
+        timeSinceLastBeat = GetMusicTimeElapsed() - timeOfLastBeat;
+        if (timeSinceLastBeat >= secsPerBeat)
         {
             OnBeat.Invoke();
         }
     }
 
+    // used to gauge whether inputs are done in time with the music
+    // greater variance means stricter timing
+    public bool IsCalledNearBeat(float variance=-1)
+    {
+        if (variance == -1)
+            variance = validBeatInputVariance;
+        return (currentBeatProgress01 <= variance || currentBeatProgress01 >= 1-variance);
+    }
 
-    public float CalcSecsPerQuestion()
+
+    public float CalcSecsPerBeat()
     {
         return (60 / bpm) / speedMult;
     }
@@ -54,5 +75,10 @@ public class BeatManager : MonoBehaviour
     {
         musicSource.pitch *= speedMult;
         musicSource.Play();
+    }
+
+    float GetMusicTimeElapsed()
+    {
+        return musicSource.time - syncFix;
     }
 }

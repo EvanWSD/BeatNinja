@@ -9,6 +9,7 @@ TagManager:
   - TargetButton
   - Enemy
   - PlayerBody
+  - Bow
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Player
   - Ground
   - Grenade
-  - 
+  - WeaponHUD
   - 
   - 
   - 

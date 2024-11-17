@@ -13,6 +13,7 @@ public class PlayerBow : MonoBehaviour
     Hitscan Hitscan;
     public BowState state;
 
+    float beatNumWhenStarted;
     float currPullBeats;
     float minPullBeats = 0.5f;
 
@@ -26,10 +27,6 @@ public class PlayerBow : MonoBehaviour
         state = BowState.None;
 
         beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
-        beat.OnBeat.AddListener(() =>
-        {
-            currPullBeats++;
-        });
     }
 
     void Update()
@@ -42,16 +39,14 @@ public class PlayerBow : MonoBehaviour
                 {
                     state = BowState.Pulling;
                     currPullBeats = 0;
+                    beatNumWhenStarted = BeatManager.beatNumLerp;
                 } 
                 break;
             case BowState.Pulling:
+                currPullBeats = BeatManager.beatNumLerp - beatNumWhenStarted;
                 if (Input.GetMouseButtonUp(0))
                 {
-                    state = BowState.None;
-                    if (currPullBeats >= minPullBeats && lookingAtShootable)
-                    {
-                        target.collider.GetComponent<IShootable>().OnShot.Invoke();
-                    }
+                    AttemptShot(target);
                 }
                 break;
             default:
@@ -75,13 +70,25 @@ public class PlayerBow : MonoBehaviour
                 reticleImg.color = Color.red;
                 target = shootable;
             }
-        }
-        else
-        {
-            lookingAtShootable = false;
-            reticleImg.color = Color.white;
+            else
+            {
+                reticleImg.color = Color.white;
+                lookingAtShootable = false;
+            }
         }
         return hit;
+    }
+
+    void AttemptShot(RaycastHit target)
+    {
+        state = BowState.None;
+        if (beat.IsCalledNearBeat())
+        {
+            if (currPullBeats >= minPullBeats && lookingAtShootable)
+            {
+                target.collider.GetComponent<IShootable>().OnShot.Invoke();
+            }
+        }
     }
 
 
