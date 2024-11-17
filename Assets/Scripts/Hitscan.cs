@@ -5,14 +5,10 @@ using UnityEngine.UI;
 public class Hitscan : MonoBehaviour
 {
     float maxDist = 100f;
+    bool lookingAtShootable;
     [SerializeField] Image reticleImg;
 
-    void Update()
-    {
-        PerformHitscan();
-    }
-
-    void PerformHitscan() {
+    protected void PerformHitscan() {
         // Define a ray from the center of the camera's viewport (screen center)
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
@@ -20,6 +16,7 @@ public class Hitscan : MonoBehaviour
         if (Physics.Raycast(ray, out hit, maxDist))
         {
             if (hit.collider.GetComponent(typeof(MonoBehaviour)) is IShootable shootable) {
+                lookingAtShootable = true;
                 reticleImg.color = Color.red;
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -29,6 +26,7 @@ public class Hitscan : MonoBehaviour
         }
         else
         {
+            lookingAtShootable = false;
             reticleImg.color = Color.white;
         }
     }
