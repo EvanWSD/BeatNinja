@@ -125,6 +125,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   explosionSphere: {fileID: 8447542225503562400}
+  iceMat: {fileID: 2100000, guid: d617ce60b39651145b501d804f3b67d0, type: 2}
+  bounceMat: {fileID: 2100000, guid: 11bc87eb89670ef48a85ad93d9d27de3, type: 2}
+  gravMat: {fileID: 2100000, guid: a34a64ae1dd3b3c4489d6b0f6ef76cc2, type: 2}
+  beepMat: {fileID: 2100000, guid: 23a0a6a5150f22d4a80967a6768a6951, type: 2}
+  icePMat: {fileID: 13400000, guid: 4b38155e7827fdc4295604db73f90af8, type: 2}
+  bouncePMat: {fileID: 13400000, guid: 52c88c483bc90034e89e2633e7e416b3, type: 2}
 --- !u!54 &1912781877267659055
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -250,7 +256,7 @@ TrailRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
