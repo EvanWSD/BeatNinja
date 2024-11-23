@@ -19,6 +19,6 @@ public class DebugBeatSquare : MonoBehaviour
 
     private void Update()
     {
-        img.color = beat.IsCalledNearBeat() ? goodColor : badColor;
+        img.color = BeatManager.IsCalledNearBeat() ? goodColor : badColor;
     }
 }

@@ -65,7 +65,7 @@ public class BasicPlayerMovement : MonoBehaviour
 
     void AbilityCheck()
     {
-        if (playerInput.dashInp && !isDashing)
+        if (playerInput.dashInp && !isDashing && BeatManager.IsCalledNearBeat())
         {
             BeginDash();
         }

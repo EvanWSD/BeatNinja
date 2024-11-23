@@ -29,7 +29,7 @@ public class ShooterEnemy : IDashable
         player = GameObject.FindGameObjectWithTag("Player");
         shootState = ShootState.OnCooldown;
         ResetShootCooldown();
-        beatManager.OnBeat.AddListener(() =>
+        BeatManager.OnBeat.AddListener(() =>
         {
             if (BeatManager.beatNum % 4 == 0 && PlayerInDetectionRange() && CanSeePlayer())
             {

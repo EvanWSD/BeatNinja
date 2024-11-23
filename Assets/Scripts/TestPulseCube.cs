@@ -10,7 +10,7 @@ public class TestPulseCube : MonoBehaviour
     private void OnEnable()
     {
         mat = GetComponent<MeshRenderer>().material;
-        bm.OnBeat.AddListener(() =>
+        BeatManager.OnBeat.AddListener(() =>
         {
             float r = Random.Range(0, 100) / 100f;
             float g = Random.Range(0, 100) / 100f;

@@ -39,7 +39,7 @@ public class Grenade : IDashable
         col = GetComponent<Collider>();
 
         beatManager = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
-        beatManager.OnBeat.AddListener(() =>
+        BeatManager.OnBeat.AddListener(() =>
         {
             beatsLeft -= 1;
             if (beatsLeft <= 0)
@@ -80,7 +80,7 @@ public class Grenade : IDashable
 
     void FixedUpdate()
     {
-        mesh.material = beatManager.IsCalledNearBeat(0.1f) ? beepMat : normalMat;
+        mesh.material = BeatManager.IsCalledNearBeat(0.1f) ? beepMat : normalMat;
     }
 
     IEnumerator Explode()

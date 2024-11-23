@@ -1,4 +1,5 @@
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,7 +13,7 @@ public class BeatManager : MonoBehaviour
     [SerializeField] AudioSource musicSource;
 
     [Tooltip("+- beat progression for which timed inputs count as 'pressed on a beat'")]
-    [SerializeField] float validBeatInputVariance = 0.2f;
+    [SerializeField] static float validBeatInputVariance = 0.2f;
 
     // For keeping time with the bpm
     float speedMult = 1f;
@@ -26,7 +27,7 @@ public class BeatManager : MonoBehaviour
     
 
     // call from other scripts
-    public UnityEvent OnBeat = new UnityEvent();
+    public static UnityEvent OnBeat = new UnityEvent();
 
     void Start()
     {
@@ -55,10 +56,10 @@ public class BeatManager : MonoBehaviour
 
     // used to gauge whether inputs are done in time with the music
     // greater variance means stricter timing
-    public bool IsCalledNearBeat(float variance=-1)
+    public static bool IsCalledNearBeat(float variance=-1)
     {
         if (variance == -1)
-            variance = validBeatInputVariance;
+            variance = BeatManager.validBeatInputVariance;
         return (currentBeatProgress01 <= variance || currentBeatProgress01 >= 1-variance);
     }
 

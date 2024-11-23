@@ -82,7 +82,7 @@ public class PlayerBow : MonoBehaviour
     void AttemptShot(RaycastHit target)
     {
         state = BowState.None;
-        if (beat.IsCalledNearBeat())
+        if (BeatManager.IsCalledNearBeat())
         {
             if (currPullBeats >= minPullBeats && lookingAtShootable)
             {

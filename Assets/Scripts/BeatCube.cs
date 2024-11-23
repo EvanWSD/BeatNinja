@@ -19,7 +19,7 @@ public class BeatCube : MonoBehaviour
 
     void OnEnable()
     {
-        bm.OnBeat.AddListener(() =>
+        BeatManager.OnBeat.AddListener(() =>
         {
             if (++cMode > modeParents.Length) cMode = 1;
             cParent.SetActive(false);
