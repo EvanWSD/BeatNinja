@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - PlayerBody
   - Bow
+  - LevelManager
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - Ground
   - Grenade
   - WeaponHUD
-  - 
+  - Checkpoint
   - 
   - 
   - 

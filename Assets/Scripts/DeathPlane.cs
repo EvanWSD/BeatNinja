@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class DeathPlane : MonoBehaviour
 {
-    [SerializeField] Transform respawnPoint;
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            // TODO: death ?? ominous
-            other.transform.position = respawnPoint.position;
+            PlrCheckpointManager plrCpManager = other.GetComponent<PlrCheckpointManager>();
+            other.transform.position = plrCpManager.lastCp.position;
+            // TODO: death
         }
     }
 }

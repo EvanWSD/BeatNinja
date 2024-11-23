@@ -1,5 +1,7 @@
 using TMPro;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class LevelManager : MonoBehaviour
 {
@@ -7,7 +9,7 @@ public class LevelManager : MonoBehaviour
     int numButtonsHit;
 
     [SerializeField] TextMeshProUGUI hitText;
-    
+
     public void IncButtonsHit()
     {
         numButtonsHit++;
