@@ -11,6 +11,9 @@ TagManager:
   - PlayerBody
   - Bow
   - LevelManager
+  - MusicSource
+  - Reticle
+  - GravVignette
   layers:
   - Default
   - TransparentFX

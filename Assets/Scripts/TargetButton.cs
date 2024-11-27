@@ -9,12 +9,22 @@ public class TargetButton : IShootable
 
     private void Start()
     {
+        level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
+
+
         OnShot.AddListener(() =>
         {
             ChangeToRandCol();
-            level.IncButtonsHit();
-            level.RefreshUI();
+            IncIfButtonSection();
         });
+    }
+
+    void IncIfButtonSection()
+    {
+        if (level?.sm.GetState() is LevelStateButton state)
+        {
+            state.OnLvlButtonHit.Invoke();
+        }
     }
 
     void ChangeToRandCol()
@@ -25,5 +35,4 @@ public class TargetButton : IShootable
         float b = Random.Range(0, 100f) / 100f;
         mat.color = new Color(r, g, b);
     }
-
 }

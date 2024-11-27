@@ -8,7 +8,7 @@ using UnityEngine.Events;
 public class BeatManager : MonoBehaviour
 {
 
-    float bpm = 105f;
+    public float bpm { get; private set; } = 105f ;
 
     [SerializeField] AudioSource musicSource;
 
