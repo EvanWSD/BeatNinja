@@ -1,4 +1,5 @@
 using Cinemachine.PostFX;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
@@ -27,6 +28,8 @@ public class BasicPlayerMovement : MonoBehaviour
     float maxDashTime = 0.2f;
     float currDashDuration = 0f;
     float goodDashImpulseMag = 10f;
+    float startFov;
+    [SerializeField] float maxDashFovDelta;
 
     // double jump
     bool doubleJumpAvailable;
@@ -47,6 +50,8 @@ public class BasicPlayerMovement : MonoBehaviour
         dashManager.OnGoodDash.AddListener(() => EndDash(true));
         dashHb = dashManager.GetComponent<Collider>();
         col = GetComponent<Collider>();
+
+        startFov = Camera.main.fieldOfView;
     }
 
     private void Update()
@@ -55,6 +60,7 @@ public class BasicPlayerMovement : MonoBehaviour
         if (isDashing)
         {
             MoveInDash();
+            DashFov();
             CheckDashDuration();
             return;
         }
@@ -93,10 +99,18 @@ public class BasicPlayerMovement : MonoBehaviour
         }
     }
 
+    void DashFov()
+    {
+        float dashProgress01 = currDashDuration / maxDashTime;
+        float dashProgressSmoothed = Sigmoid((dashProgress01-0.5f)*4);
+        Camera.main.fieldOfView = Mathf.Lerp(startFov, startFov+maxDashFovDelta, dashProgressSmoothed);
+    }
+
     void EndDash(bool hitValidTarget)
     {
         isDashing = false;
         dashHb.enabled = false;
+        Camera.main.fieldOfView = startFov;
         if (hitValidTarget)
         {
             v.y = goodDashImpulseMag;
@@ -180,5 +194,10 @@ public class BasicPlayerMovement : MonoBehaviour
     void DoJump()
     {
         v.y = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+    }
+
+    float Sigmoid(float x)
+    {
+        return 1 / (1 + Mathf.Exp(-x));
     }
 }
