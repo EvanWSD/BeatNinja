@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Cinemachine.DocumentationSortingAttribute;
 
 public enum ShootState
 {
@@ -24,9 +25,12 @@ public class ShooterEnemy : IDashable
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] BeatManager beatManager;
 
+    LevelManager level;
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
         shootState = ShootState.OnCooldown;
         ResetShootCooldown();
         BeatManager.OnBeat.AddListener(() =>
@@ -41,6 +45,10 @@ public class ShooterEnemy : IDashable
 
         OnDashedInto.AddListener(() =>
         {
+            if (level?.sm.GetState() is LevelStateElim state)
+            {
+                state.OnEnemyElim.Invoke();
+            }
             Destroy(gameObject);
         });
     }

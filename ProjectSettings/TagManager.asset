@@ -14,6 +14,9 @@ TagManager:
   - MusicSource
   - Reticle
   - GravVignette
+  - ElimSectionUI
+  - ButtonSectionUI
+  - EscapeSectionUI
   layers:
   - Default
   - TransparentFX

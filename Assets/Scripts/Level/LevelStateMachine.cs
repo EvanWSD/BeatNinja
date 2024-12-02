@@ -1,5 +1,3 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public enum SectionType
@@ -10,11 +8,11 @@ public enum SectionType
     Escape
 }
 
-public class StateMachine : MonoBehaviour
+public class LevelStateMachine : MonoBehaviour
 {
-    private IState state;
+    private ILevelState state;
    
-    public void SetState(IState newState)
+    public void SetState(ILevelState newState)
     {
         state?.Exit();
         state = newState;
@@ -26,7 +24,7 @@ public class StateMachine : MonoBehaviour
         state?.Update();
     }
 
-    public IState GetState()
+    public ILevelState GetState()
     {
         return state;
     }

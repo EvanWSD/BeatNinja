@@ -1,7 +1,4 @@
-using Cinemachine.PostFX;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 public class BasicPlayerMovement : MonoBehaviour
 {

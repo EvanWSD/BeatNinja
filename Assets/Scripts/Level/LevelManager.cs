@@ -1,28 +1,24 @@
-using TMPro;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    int numButtonsGoal;
-    int numButtonsHit;
+    public LevelStateMachine sm;
+    public GameObject currSectionEndDoor;
 
-    public StateMachine sm;
-
-    [SerializeField] TextMeshProUGUI hitText;
-
-    private void Start()
+    void Start()
     {
-        sm = GetComponent<StateMachine>();
+        sm = GetComponent<LevelStateMachine>();
         sm.SetState(new LevelStateNone());
     }
 
-    public void IncButtonsHit()
+    void Update()
     {
-        numButtonsHit++;
+        // on section goal complete
+        if (sm.GetState().CheckWinCondition())
+        {
+            currSectionEndDoor.SetActive(false);
+            sm.SetState(new LevelStateNone());
+        }
     }
 
-    public void RefreshUI()
-    {
-        hitText.text = $"{numButtonsHit}";
-    }
 }

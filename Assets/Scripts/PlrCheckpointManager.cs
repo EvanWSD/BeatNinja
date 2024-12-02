@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlrCheckpointManager : MonoBehaviour
 {
-    public int currCpNum { get; private set; } = 1;
+    public int currCpNum { get; private set; } = 0;
     public Transform lastCp { get; private set; }
     LevelManager level;
 
@@ -11,7 +11,7 @@ public class PlrCheckpointManager : MonoBehaviour
         level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
     }
 
-    public void OnCheckpointReached(int newIndex, Transform cpTransform, bool isNewSection, SectionType sectionType = SectionType.None)
+    public void OnCheckpointReached(int newIndex, Transform cpTransform, bool isNewSection, GameObject endOfSectionDoor, SectionType sectionType = SectionType.None)
     {
         if (newIndex > currCpNum)
         {
@@ -20,6 +20,7 @@ public class PlrCheckpointManager : MonoBehaviour
             if (isNewSection)
             {
                 level.sm.SetLevelStateFromEnum(sectionType);
+                level.currSectionEndDoor = endOfSectionDoor;
             }
         }
     } 
