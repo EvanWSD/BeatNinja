@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class TargetButton : IShootable
 {
-    [SerializeField] LevelManager level;
+    LevelManager level;
 
     private void Start()
     {
         level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
-
 
         OnShot.AddListener(() =>
         {

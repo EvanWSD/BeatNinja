@@ -7,8 +7,8 @@ using UnityEngine.Events;
 // Manages the timing of code to the beat of the music (using manually input bpm)
 public class BeatManager : MonoBehaviour
 {
-
-    public float bpm { get; private set; } = 105f ;
+    // ven 105f?
+    public float bpm { get; private set; } = 115f ;
 
     [SerializeField] AudioSource musicSource;
 

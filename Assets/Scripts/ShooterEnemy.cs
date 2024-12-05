@@ -10,32 +10,35 @@ public enum ShootState
 
 public class ShooterEnemy : IDashable
 {
-    GameObject player;
-    [SerializeField]
-    [Range(1, 30)]
-    float maxDetectionDistance;
+    protected GameObject player;
+
+    [SerializeField] [Range(1, 60)] float maxDetectionDistance;
     [SerializeField] bool showDetectionGizmo;
+    [SerializeField] float beatCooldown=4f;
 
     ShootState shootState;
 
     float shootCd;
-    float shootCdMax = 3f;
+    float shootCdMax = 0f;
     float shootCdVariance;
 
     [SerializeField] GameObject bulletPrefab;
-    [SerializeField] BeatManager beatManager;
 
     LevelManager level;
 
-    private void Start()
+    protected virtual void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
+
         shootState = ShootState.OnCooldown;
         ResetShootCooldown();
+
+        if (beatCooldown <= 0) beatCooldown = 4;
+
         BeatManager.OnBeat.AddListener(() =>
         {
-            if (BeatManager.beatNum % 4 == 0 && PlayerInDetectionRange() && CanSeePlayer())
+            if (BeatManager.beatNum % beatCooldown == 0 && PlayerInDetectionRange() && CanSeePlayer())
             {
                 Shoot(player.transform);
                 shootState = ShootState.OnCooldown;
@@ -75,12 +78,12 @@ public class ShooterEnemy : IDashable
         shootCd = shootCdMax;
     }
 
-    bool PlayerInDetectionRange()
+    protected bool PlayerInDetectionRange()
     {
         return Vector3.Distance(player.transform.position, transform.position) < maxDetectionDistance;
     }
 
-    bool CanSeePlayer()
+    protected bool CanSeePlayer()
     {
         RaycastHit hit;
         Vector3 eyePos = transform.position + Vector3.up;
@@ -95,6 +98,7 @@ public class ShooterEnemy : IDashable
     void Shoot(Transform target)
     {
         EnemyBullet newBullet = Instantiate(bulletPrefab, transform).GetComponent<EnemyBullet>();
+        newBullet.transform.SetParent(null);
         Vector3 toTarget = target.transform.position - transform.position;
         newBullet.SetTrajectory(toTarget);
     }
@@ -102,6 +106,7 @@ public class ShooterEnemy : IDashable
     void Shoot(Transform target, Vector3 offset)
     {
         EnemyBullet newBullet = Instantiate(bulletPrefab, transform).GetComponent<EnemyBullet>();
+        newBullet.transform.SetParent(null);
         Vector3 toTarget = target.transform.position - transform.position + offset;
         newBullet.SetTrajectory(toTarget);
     }

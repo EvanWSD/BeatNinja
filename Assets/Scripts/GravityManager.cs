@@ -16,7 +16,7 @@ public class GravityManager : MonoBehaviour
     static GravState currGravState;
     static GravState prevGravState;
 
-    [SerializeField] FirstPersonController player;
+    BasicPlayerMovement player;
 
     // powerup timers
     float defaultPuTimerMax = 10f;
@@ -26,6 +26,7 @@ public class GravityManager : MonoBehaviour
 
     private void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<BasicPlayerMovement>();
         currGravState = GravState.Normal;
     }
 

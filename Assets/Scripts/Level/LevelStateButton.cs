@@ -4,9 +4,9 @@ using UnityEngine.Events;
 
 public class LevelStateButton : ILevelState
 {
-    // for editing BNLevelData ScriptableObject
     [SerializeField] int numButtonsTarget;
     int numButtonsHit = 0;
+
     TextMeshProUGUI buttonsHitText;
 
     public UnityEvent OnLvlButtonHit = new UnityEvent();
@@ -23,10 +23,6 @@ public class LevelStateButton : ILevelState
             numButtonsHit++;
             UpdateButtonsHitUI();
         });
-
-        UI = GameObject.FindGameObjectWithTag("ButtonSectionUI");
-        UI.SetActive(true);
-        buttonsHitText = UI.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     public override void Update() { }

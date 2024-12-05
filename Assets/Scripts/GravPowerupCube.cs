@@ -32,7 +32,7 @@ public class GravPowerupCube : MonoBehaviour
     private void Start()
     {
         ppVolume = GameObject.FindGameObjectWithTag("GravVignette").GetComponent<Volume>();
-
+        gravManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<GravityManager>();
         mesh = GetComponent<MeshRenderer>();
         ppVolume.sharedProfile.TryGet(out vignette);
     }

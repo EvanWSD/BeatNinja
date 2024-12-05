@@ -18,6 +18,7 @@ public class LevelStateEscape : ILevelState
         escapeTimer = timeToEscapeMax;
         UI = GameObject.FindGameObjectWithTag("EscapeSectionUI");
         UI.SetActive(true);
+        
         timerText = UI.GetComponentInChildren<TextMeshProUGUI>();
     }
 

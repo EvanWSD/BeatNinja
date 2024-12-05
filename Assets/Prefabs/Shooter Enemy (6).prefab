@@ -126,9 +126,9 @@ MonoBehaviour:
       m_Calls: []
   maxDetectionDistance: 30
   showDetectionGizmo: 0
+  beatCooldown: 4
   bulletPrefab: {fileID: 3370401530023663216, guid: e94722caf3c9c98478c5f342733d1a20,
     type: 3}
-  beatManager: {fileID: 0}
 --- !u!54 &4840365950158208824
 Rigidbody:
   m_ObjectHideFlags: 0

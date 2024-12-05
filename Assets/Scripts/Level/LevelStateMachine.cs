@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum SectionType
 {
@@ -11,11 +12,14 @@ public enum SectionType
 public class LevelStateMachine : MonoBehaviour
 {
     private ILevelState state;
+
+    public UnityEvent<ILevelState> OnLevelStateChanged = new UnityEvent<ILevelState>();
    
     public void SetState(ILevelState newState)
     {
         state?.Exit();
         state = newState;
+        OnLevelStateChanged.Invoke(state);
         state.Enter();
     }
 
