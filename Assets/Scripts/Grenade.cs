@@ -1,11 +1,15 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class Grenade : IDashable
 {
     int maxBeatLifetime = 5;
     float beatsLeft;
-    float explosionRadius = 1f;
+    float explosionRadius = 10f;
+    bool isExploding;
+    [SerializeField] LayerMask explodableMask;
+
     GrenadeMode mode;
     [SerializeField] GameObject explosionSphere;
 
@@ -25,8 +29,6 @@ public class Grenade : IDashable
     MeshRenderer mesh;
     Collider col;
 
-    BeatManager beatManager;
-
     void Awake()
     {
         beatsLeft = maxBeatLifetime;
@@ -38,12 +40,12 @@ public class Grenade : IDashable
         mesh = GetComponent<MeshRenderer>();
         col = GetComponent<Collider>();
 
-        beatManager = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
         BeatManager.OnBeat.AddListener(() =>
         {
             beatsLeft -= 1;
-            if (beatsLeft <= 0)
+            if (beatsLeft <= 0 && !isExploding)
             {
+                isExploding = true;
                 StartCoroutine(Explode());
             }
         });
@@ -86,10 +88,29 @@ public class Grenade : IDashable
     IEnumerator Explode()
     {
         explosionSphere.SetActive(true);
-        explosionSphere.transform.localScale = Vector3.one * explosionRadius * 10f;
+        explosionSphere.transform.localScale = Vector3.one * explosionRadius * 5f;
         rb.constraints = RigidbodyConstraints.FreezeAll;
         mesh.enabled = false;
+        DestroyObjectsInRadius();
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
+    }
+
+    void DestroyObjectsInRadius()
+    {
+        Collider[] allNearbyExplodables = Physics.OverlapSphere(transform.position, explosionRadius);
+        foreach (Collider col in allNearbyExplodables.Where(IsInLOS))
+        {
+            if (col.CompareTag("Enemy"))
+            {
+                col.TryGetComponent(out ShooterEnemy enemy);
+                enemy?.OnExploded.Invoke();
+            }
+        }
+    }
+
+    bool IsInLOS(Collider col)
+    {
+        return Physics.Raycast(transform.position, col.transform.position - transform.position, explosionRadius);
     }
 }

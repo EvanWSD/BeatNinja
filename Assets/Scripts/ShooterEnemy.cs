@@ -1,5 +1,5 @@
 using UnityEngine;
-using static Cinemachine.DocumentationSortingAttribute;
+using UnityEngine.Events;
 
 public enum ShootState
 {
@@ -26,6 +26,9 @@ public class ShooterEnemy : IDashable
 
     LevelManager level;
 
+    public UnityEvent OnExploded = new UnityEvent();
+    public UnityEvent OnDefeated = new UnityEvent();
+
     protected virtual void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -46,29 +49,29 @@ public class ShooterEnemy : IDashable
             }
         });
 
-        OnDashedInto.AddListener(() =>
+        OnDefeated.AddListener(() =>
         {
+            // add one to elim score if player is the killer
             if (level?.sm.GetState() is LevelStateElim state)
             {
                 state.OnEnemyElim.Invoke();
             }
-            Destroy(gameObject);
+            Die();
         });
+
+        OnDashedInto.AddListener(OnDefeated.Invoke);
+        OnExploded.AddListener(OnDefeated.Invoke);
     }
 
     private void Update()
     {
-
         switch (shootState)
         {
-            case ShootState.Ready:
-
-                break;
+            default: break;
+            case ShootState.Ready: break;
             case ShootState.OnCooldown:
                 shootCd -= Time.deltaTime;
                 if (shootCd < 0) shootState = ShootState.Ready;
-                break;
-            default:
                 break;
         }
     }
@@ -109,6 +112,11 @@ public class ShooterEnemy : IDashable
         newBullet.transform.SetParent(null);
         Vector3 toTarget = target.transform.position - transform.position + offset;
         newBullet.SetTrajectory(toTarget);
+    }
+
+    void Die()
+    {
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()

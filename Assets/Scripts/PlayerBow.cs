@@ -9,8 +9,6 @@ public enum BowState
 
 public class PlayerBow : MonoBehaviour
 {
-    BeatManager beat;
-    Hitscan Hitscan;
     public BowState state;
 
     float beatNumWhenStarted;
@@ -21,12 +19,14 @@ public class PlayerBow : MonoBehaviour
     bool lookingAtShootable;
     [SerializeField] Image reticleImg;
 
+    [SerializeField] GameObject bowObj;
+    float baseScale;
+    [SerializeField] float maxScaleDelta;
 
     void Start()
     {
         state = BowState.None;
-
-        beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
+        baseScale = bowObj.transform.localScale.x;
     }
 
     void Update()
@@ -44,9 +44,11 @@ public class PlayerBow : MonoBehaviour
                 break;
             case BowState.Pulling:
                 currPullBeats = BeatManager.beatNumLerp - beatNumWhenStarted;
+                LerpBowScale();
                 if (Input.GetMouseButtonUp(0))
                 {
                     AttemptShot(target);
+                    ResetBowScale();
                 }
                 break;
             default:
@@ -91,5 +93,16 @@ public class PlayerBow : MonoBehaviour
         }
     }
 
+    void LerpBowScale()
+    {
+        Vector3 scale = bowObj.transform.localScale;
+        scale.x = Mathf.Lerp(baseScale, baseScale+maxScaleDelta, currPullBeats / minPullBeats);
+        bowObj.transform.localScale = scale;
+    }
 
+    void ResetBowScale()
+    {
+        Vector3 scale = bowObj.transform.localScale;
+        bowObj.transform.localScale = new Vector3(baseScale, scale.y, scale.z);
+    }
 }

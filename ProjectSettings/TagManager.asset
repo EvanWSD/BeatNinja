@@ -17,6 +17,7 @@ TagManager:
   - ElimSectionUI
   - ButtonSectionUI
   - EscapeSectionUI
+  - EnemyBullet
   layers:
   - Default
   - TransparentFX

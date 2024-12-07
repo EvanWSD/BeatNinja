@@ -4,7 +4,7 @@ public class Checkpoint : MonoBehaviour
 {
     [SerializeField] int checkpointIndex = 1;
     [SerializeField] bool atNewSection;
-    [SerializeField] SectionType nextState; // section type once plr reaches here 
+    [SerializeField] protected SectionType nextState; // section type once plr reaches here 
     [SerializeField] GameObject endOfSectionDoor;
 
     void OnTriggerEnter(Collider other)

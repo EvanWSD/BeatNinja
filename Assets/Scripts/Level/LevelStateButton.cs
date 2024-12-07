@@ -1,4 +1,5 @@
 using TMPro;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -21,8 +22,13 @@ public class LevelStateButton : ILevelState
         numButtonsHit = 0;
         OnLvlButtonHit.AddListener(() => {
             numButtonsHit++;
-            UpdateButtonsHitUI();
+            UpdateUI();
         });
+
+        UI = GameObject.FindGameObjectWithTag("ButtonSectionUI");
+        UI.SetActive(true);
+        buttonsHitText = UI.GetComponentInChildren<TextMeshProUGUI>();
+        UpdateUI();
     }
 
     public override void Update() { }
@@ -34,8 +40,8 @@ public class LevelStateButton : ILevelState
         return numButtonsHit >= numButtonsTarget;
     }
 
-    void UpdateButtonsHitUI()
+    void UpdateUI()
     {
-        buttonsHitText.text = $"{numButtonsHit} / {numButtonsTarget}";
+        buttonsHitText.text = $"Buttons: {numButtonsHit} / {numButtonsTarget}";
     }
 }

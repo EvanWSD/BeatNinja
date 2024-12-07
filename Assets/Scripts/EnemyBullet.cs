@@ -25,8 +25,8 @@ public class EnemyBullet : MonoBehaviour
         this.dir = dir.normalized;
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        Destroy(gameObject);
+        Destroy(this.gameObject);
     }
 }

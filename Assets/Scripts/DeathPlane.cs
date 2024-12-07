@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class DeathPlane : MonoBehaviour
@@ -9,9 +6,7 @@ public class DeathPlane : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlrCheckpointManager plrCpManager = other.GetComponent<PlrCheckpointManager>();
-            other.transform.position = plrCpManager.lastCp.position;
-            // TODO: death
+            other.GetComponent<PlrDeath>().OnPlayerDeath.Invoke();
         }
     }
 }

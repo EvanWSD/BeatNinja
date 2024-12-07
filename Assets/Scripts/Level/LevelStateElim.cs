@@ -20,12 +20,13 @@ public class LevelStateElim : ILevelState
         OnEnemyElim.AddListener(() =>
         {
             numElims++;
-            CheckWinCondition();
+            ResetUI();
         });
 
         UI = GameObject.FindGameObjectWithTag("ElimSectionUI");
         UI.SetActive(true);
         elimCounterText = UI.GetComponentInChildren<TextMeshProUGUI>();
+        ResetUI();
     }
 
     public override void Update() { }
@@ -40,7 +41,7 @@ public class LevelStateElim : ILevelState
 
     void ResetUI()
     {
-        elimCounterText.text = $"{elimCounterText} / {numElimsTarget}";
+        elimCounterText.text = $"Elim: {numElims} / {numElimsTarget}";
     }
 
 
