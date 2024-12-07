@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class BasicPlayerMovement : MonoBehaviour
@@ -14,6 +16,7 @@ public class BasicPlayerMovement : MonoBehaviour
     public float groundCheckRadius;
 
     Vector3 v;
+    float fanInfluence;
     bool isGrounded;
 
     // dash
