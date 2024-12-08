@@ -38,12 +38,6 @@ public class ReticleManager : MonoBehaviour
         ind.StartIndicator(maxTTL, maxDistance.x, isLeft);
     }
 
-    void DestroyAllIndicators()
-    {
-
-    }
-
-
     float BeatsToSecs(float numBeats)
     {
         return numBeats * bm.CalcSecsPerBeat();

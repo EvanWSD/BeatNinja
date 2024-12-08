@@ -48,7 +48,7 @@ public class BeatManager : MonoBehaviour
         }
 
         // loop song if over
-        if (GetMusicTimeElapsed() >= musicSource.clip.length)
+        if (musicSource.time >= musicSource.clip.length - 0.1f)
         {
             NewSong(musicSource.clip, this.bpm);
         }
