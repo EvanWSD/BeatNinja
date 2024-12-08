@@ -1,18 +1,23 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Checkpoint : MonoBehaviour
 {
-    [SerializeField] int checkpointIndex = 1;
-    [SerializeField] bool atNewSection;
-    [SerializeField] protected SectionType nextState; // section type once plr reaches here 
-    [SerializeField] GameObject endOfSectionDoor;
+    [SerializeField] public int checkpointIndex = 1;
+    [SerializeField] public bool atNewSection;
+    [SerializeField] public SectionType nextState;
+    [SerializeField] public GameObject endOfSectionDoor;
+
+    public UnityEvent OnThisCheckpointReached = new UnityEvent();
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.TryGetComponent(out PlrCheckpointManager player))
         {
-            PlrCheckpointManager player = other.GetComponent<PlrCheckpointManager>();
-            player.OnCheckpointReached(checkpointIndex, transform, atNewSection, endOfSectionDoor, nextState);
+            if (player.TryNewCheckpoint(this)) // if checkpoint is new to plr
+            {
+                OnThisCheckpointReached.Invoke();
+            }
         }
     }
 }

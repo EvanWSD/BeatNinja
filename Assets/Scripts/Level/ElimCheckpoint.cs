@@ -6,6 +6,6 @@ public class ElimCheckpoint : Checkpoint
 
     private void Start()
     {
-        nextState = SectionType.Elims;
+        //nextState = SectionType.Elims;
     }
 }

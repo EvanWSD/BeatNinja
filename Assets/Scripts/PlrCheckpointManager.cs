@@ -1,8 +1,10 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlrCheckpointManager : MonoBehaviour
 {
-    public int currCpNum { get; private set; } = 1;
+    public int currCpNum { get; private set; } = 0;
     public Transform lastCp { get; private set; }
     LevelManager level;
 
@@ -14,17 +16,19 @@ public class PlrCheckpointManager : MonoBehaviour
         lastCp = initCheckpoint.transform;
     }
 
-    public void OnCheckpointReached(int newIndex, Transform cpTransform, bool isNewSection, GameObject endOfSectionDoor, SectionType sectionType = SectionType.None)
+    public bool TryNewCheckpoint(Checkpoint cp)
     {
-        if (newIndex > currCpNum)
+        if (cp.checkpointIndex >= currCpNum)
         {
-            currCpNum = newIndex;
-            lastCp = cpTransform;
-            if (isNewSection)
+            currCpNum = cp.checkpointIndex;
+            lastCp = cp.transform;
+            if (cp.atNewSection)
             {
-                level.sm.SetLevelStateFromEnum(sectionType);
-                level.currSectionEndDoor = endOfSectionDoor;
+                level.sm.SetLevelStateFromEnum(cp.nextState);
+                level.currSectionEndDoor = cp.endOfSectionDoor;
             }
+            return true;
         }
+        else return false;
     }
 }

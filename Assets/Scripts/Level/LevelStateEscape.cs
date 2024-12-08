@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using TMPro;
 using UnityEngine;
 
@@ -8,17 +7,19 @@ public class LevelStateEscape : ILevelState
     float escapeTimer;
     TextMeshProUGUI timerText;
 
-    public LevelStateEscape(float timeToEscapeMax = 30f)
+    GameObject player;
+
+    public LevelStateEscape(float timeToEscapeMax = 60f)
     {
         this.timeToEscapeMax = timeToEscapeMax;
     }
 
     public override void Enter()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         escapeTimer = timeToEscapeMax;
         UI = GameObject.FindGameObjectWithTag("EscapeSectionUI");
         UI.SetActive(true);
-        
         timerText = UI.GetComponentInChildren<TextMeshProUGUI>();
     }
 
@@ -27,7 +28,8 @@ public class LevelStateEscape : ILevelState
         UpdateEscapeUI();
         if (escapeTimer <= 0)
         {
-            // die/restart
+            escapeTimer = timeToEscapeMax;
+            player.GetComponent<PlrDeath>().OnPlayerDeath.Invoke();
         }
     }
     public override void Exit() {

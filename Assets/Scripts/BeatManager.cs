@@ -1,5 +1,3 @@
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,7 +13,6 @@ public class BeatManager : MonoBehaviour
     [Tooltip("+- beat progression for which timed inputs count as 'pressed on a beat'")]
     [SerializeField] static float validBeatInputVariance = 0.2f;
 
-    // For keeping time with the bpm
     float speedMult = 1f;
     public static float beatNum = 1;
     public static float beatNumLerp;
@@ -25,13 +22,13 @@ public class BeatManager : MonoBehaviour
     public float secsPerBeat { get; private set; }
     const float syncFix = 0.1f; // AudioSources in Unity have a slight unavoidable delay
     
-
-    // call from other scripts
     public static UnityEvent OnBeat = new UnityEvent();
+    public UnityEvent OnNewMusic = new UnityEvent();
 
     void Start()
     {
         secsPerBeat = CalcSecsPerBeat();
+        OnNewMusic.Invoke();
         OnBeat.AddListener(() => { 
             beatNum++;
             timeOfLastBeat = GetMusicTimeElapsed();
@@ -42,13 +39,18 @@ public class BeatManager : MonoBehaviour
     void Update()
     {
         // invokes OnBeat in time with the music
-        // timeSinceLastBeat = (musicSource.time - syncFix) / beatNum;
         currentBeatProgress01 = timeSinceLastBeat / secsPerBeat;
         beatNumLerp = beatNum + currentBeatProgress01;
         timeSinceLastBeat = GetMusicTimeElapsed() - timeOfLastBeat;
         if (timeSinceLastBeat >= secsPerBeat)
         {
             OnBeat.Invoke();
+        }
+
+        // loop song if over
+        if (GetMusicTimeElapsed() >= musicSource.clip.length)
+        {
+            NewSong(musicSource.clip, this.bpm);
         }
 
         CanvasDebugText.Write(beatNum, "beatNum");
@@ -63,6 +65,17 @@ public class BeatManager : MonoBehaviour
         return (currentBeatProgress01 <= variance || currentBeatProgress01 >= 1-variance);
     }
 
+
+    public void NewSong(AudioClip newMusic, float bpm)
+    {
+        OnNewMusic.Invoke();
+        this.bpm = bpm;
+        secsPerBeat = CalcSecsPerBeat();
+        musicSource.clip = newMusic;
+        musicSource.Stop();
+        musicSource.Play();
+        beatNum = 0f;
+    }
 
     public float CalcSecsPerBeat()
     {
@@ -84,4 +97,5 @@ public class BeatManager : MonoBehaviour
     {
         return musicSource.time - syncFix;
     }
+
 }

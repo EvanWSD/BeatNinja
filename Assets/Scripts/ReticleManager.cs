@@ -19,10 +19,15 @@ public class ReticleManager : MonoBehaviour
         reticle = GameObject.FindGameObjectWithTag("Reticle").transform;
 
         maxTTL = BeatsToSecs(maxTTLInBeats);
+
         BeatManager.OnBeat.AddListener(() =>
         {
             CreateNewIndicator(false);
             CreateNewIndicator(true);
+        });
+        bm.OnNewMusic.AddListener(() =>
+        {
+            maxTTL = BeatsToSecs(maxTTLInBeats);
         });
     }
 
@@ -32,6 +37,12 @@ public class ReticleManager : MonoBehaviour
         BeatIndicatorUI ind = indObj.GetComponent<BeatIndicatorUI>();
         ind.StartIndicator(maxTTL, maxDistance.x, isLeft);
     }
+
+    void DestroyAllIndicators()
+    {
+
+    }
+
 
     float BeatsToSecs(float numBeats)
     {

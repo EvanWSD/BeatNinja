@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.Image;
 
 public enum BowState
 {
@@ -14,6 +15,8 @@ public class PlayerBow : MonoBehaviour
     float beatNumWhenStarted;
     float currPullBeats;
     float minPullBeats = 0.5f;
+
+    [SerializeField] LayerMask shootableTriggers;
 
     float maxDist = 100f;
     bool lookingAtShootable;
@@ -63,9 +66,12 @@ public class PlayerBow : MonoBehaviour
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
         RaycastHit hit;
+        RaycastHit triggerHit;
         IShootable target;
-        if (Physics.Raycast(ray, out hit, maxDist))
+        bool triggerRaycast = Physics.Raycast(ray, out triggerHit, maxDist, shootableTriggers, QueryTriggerInteraction.Collide);
+        if (Physics.Raycast(ray, out hit, maxDist) || triggerRaycast)
         {
+            if (triggerRaycast) hit = triggerHit;
             if (hit.collider.GetComponent(typeof(MonoBehaviour)) is IShootable shootable)
             {
                 lookingAtShootable = true;

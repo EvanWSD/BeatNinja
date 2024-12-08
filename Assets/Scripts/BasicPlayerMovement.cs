@@ -1,10 +1,10 @@
-using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Specialized;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class BasicPlayerMovement : MonoBehaviour
 {
-    CharacterController cc;
+    Rigidbody rb;
     PlayerInput playerInput;
 
     public float moveSpeed;
@@ -15,14 +15,13 @@ public class BasicPlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius;
 
-    Vector3 v;
-    float fanInfluence;
     bool isGrounded;
+    bool isDashing;
+    bool isSliding;
 
     // dash
     [SerializeField] DashManager dashManager;
     Collider dashHb;
-    bool isDashing;
     float dashSpeed = 75f;
     Vector3 dashDir;
     float maxDashTime = 0.2f;
@@ -40,12 +39,11 @@ public class BasicPlayerMovement : MonoBehaviour
     [SerializeField] Collider col;
     [SerializeField] PhysicMaterial defaultPMat;
     [SerializeField] PhysicMaterial slidePMat;
-    bool isSliding;
     Vector3 currSlideVelocity;
 
     private void Start()
     {
-        cc = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
         dashManager.OnGoodDash.AddListener(() => EndDash(true));
         dashHb = dashManager.GetComponent<Collider>();
@@ -69,6 +67,11 @@ public class BasicPlayerMovement : MonoBehaviour
         ChangePhysicsMaterial();
     }
 
+    void ChangePhysicsMaterial()
+    {
+        col.material = Input.GetKey(KeyCode.C) ? slidePMat : defaultPMat;
+    }
+
     void AbilityCheck()
     {
         if (playerInput.dashInp && !isDashing && BeatManager.IsCalledNearBeat())
@@ -87,7 +90,8 @@ public class BasicPlayerMovement : MonoBehaviour
 
     void MoveInDash()
     {
-        cc.Move(dashDir * dashSpeed * Time.deltaTime);
+        //cc.Move(dashDir * dashSpeed * Time.deltaTime);
+        rb.velocity = dashDir * dashSpeed;
     }
 
     void CheckDashDuration()
@@ -113,7 +117,7 @@ public class BasicPlayerMovement : MonoBehaviour
         Camera.main.fieldOfView = startFov;
         if (hitValidTarget)
         {
-            v.y = goodDashImpulseMag;
+            rb.velocity = new Vector3(rb.velocity.x, goodDashImpulseMag, rb.velocity.z); 
             doubleJumpAvailable = true;
             doubleJumpTimer = doubleJumpTimerMax;
         }
@@ -124,35 +128,25 @@ public class BasicPlayerMovement : MonoBehaviour
                 isSliding = true;
                 currSlideVelocity = dashDir * dashSpeed / 4f;
                 currSlideVelocity.y = 0f;
-                v = currSlideVelocity;
+                rb.velocity = currSlideVelocity;
             }
-            v.y = 0;
+            //v.y = 0;
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         }
     }
-
-    void ChangePhysicsMaterial()
-    {
-        col.material = Input.GetKey(KeyCode.C) ? slidePMat : defaultPMat;
-    }
-
 
     private void CheckGrounded()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayers);
     }
     private void MoveCharacter(Vector3 moveInp, bool jumpInp) {
-        
-        // clamp grounded velocity
-        if (isGrounded && v.y < 0f)
-        {
-            v.y = -2f;
-        }
 
-        // input influence
+        // input
         Vector3 moveDir = transform.right * moveInp.x + transform.forward * moveInp.z;
         if (!isSliding)
         {
-            cc.Move(moveDir * moveSpeed * Time.deltaTime);
+            moveDir *= moveSpeed;
+            rb.velocity = new Vector3(moveDir.x, rb.velocity.y, moveDir.z);
         };
 
         // jump
@@ -183,17 +177,14 @@ public class BasicPlayerMovement : MonoBehaviour
         if (isSliding && Input.GetKeyUp(KeyCode.C))
         {
             isSliding = false;
-            v -= currSlideVelocity;
+            rb.velocity -= currSlideVelocity;
         }
-
-        // physics influence
-        v.y += Physics.gravity.y * Time.deltaTime;
-        cc.Move(v * Time.deltaTime);
     }
 
     void DoJump()
     {
-        v.y = Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y);
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        rb.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y), ForceMode.Impulse);
     }
 
     float Sigmoid(float x)

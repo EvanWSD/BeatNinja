@@ -8,6 +8,6 @@ public class FanVectorField : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         other.TryGetComponent(out Rigidbody rb);
-        rb.AddForce(pushDir * fanStrength, ForceMode.VelocityChange);
+        rb.AddForce(pushDir * fanStrength, ForceMode.Acceleration);
     }
 }

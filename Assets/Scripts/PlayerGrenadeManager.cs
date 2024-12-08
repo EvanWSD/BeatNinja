@@ -1,17 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SearchService;
-using UnityEngine.UI;
 
 public enum GrenadeMode
 {
     Ice,
     Bounce,
-    Gravity // unlockable
+    Gravity
 }
 
 public class PlayerGrenadeManager : MonoBehaviour
@@ -57,7 +51,7 @@ public class PlayerGrenadeManager : MonoBehaviour
 
     GrenadeMode NextGrenadeMode(GrenadeMode mode)
     {
-        return (GrenadeMode)(((int)mode + 1) % 3); //wrapz to 0
+        return (GrenadeMode)(((int)mode + 1) % 2); //wraps to 0, mod 3 to reenable grav grenade
     }
 
     void UpdateModeUIText()

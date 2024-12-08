@@ -20,5 +20,4 @@ public class LevelManager : MonoBehaviour
             sm.SetState(new LevelStateNone());
         }
     }
-
 }

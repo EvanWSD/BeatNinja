@@ -7,6 +7,9 @@ public class Grenade : IDashable
     int maxBeatLifetime = 5;
     float beatsLeft;
     float explosionRadius = 10f;
+    float explosionDuration = 1f;
+    float maxExplosionSizeTime = 0.15f;
+    float currExplosionTime;
     bool isExploding;
     [SerializeField] LayerMask explodableMask;
 
@@ -40,18 +43,34 @@ public class Grenade : IDashable
         mesh = GetComponent<MeshRenderer>();
         col = GetComponent<Collider>();
 
+        ApplyModeChanges(mode);
+
         BeatManager.OnBeat.AddListener(() =>
         {
             beatsLeft -= 1;
             if (beatsLeft <= 0 && !isExploding)
             {
-                isExploding = true;
                 StartCoroutine(Explode());
             }
         });
 
-        ApplyModeChanges(mode);
+    }
 
+    private void Update()
+    {
+        if (isExploding)
+        {
+            currExplosionTime += Time.deltaTime;
+            LerpExplosionSize();
+        }
+    }
+
+    void LerpExplosionSize()
+    {
+        Vector3 maxScale = Vector3.one * explosionRadius * 5f;
+        Vector3 currScale = maxScale * currExplosionTime / maxExplosionSizeTime;
+        currScale = Vector3.Min(currScale, maxScale);
+        explosionSphere.transform.localScale = currScale;
     }
 
     void ApplyModeChanges(GrenadeMode mode)
@@ -85,18 +104,24 @@ public class Grenade : IDashable
         mesh.material = BeatManager.IsCalledNearBeat(0.1f) ? beepMat : normalMat;
     }
 
-    IEnumerator Explode()
+    public IEnumerator Explode()
     {
-        explosionSphere.SetActive(true);
-        explosionSphere.transform.localScale = Vector3.one * explosionRadius * 5f;
+        isExploding = true;
+        currExplosionTime = 0f;
+        ReplaceWithExplosionMesh();
         rb.constraints = RigidbodyConstraints.FreezeAll;
-        mesh.enabled = false;
-        DestroyObjectsInRadius();
-        yield return new WaitForSeconds(1);
-        Destroy(gameObject);
+        ExplodeInRadiusAndLOS();
+        yield return new WaitForSeconds(explosionDuration);
+        Destroy(this.gameObject);
     }
 
-    void DestroyObjectsInRadius()
+    void ReplaceWithExplosionMesh()
+    {
+        explosionSphere.SetActive(true);
+        mesh.enabled = false;
+    }
+
+    void ExplodeInRadiusAndLOS()
     {
         Collider[] allNearbyExplodables = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (Collider col in allNearbyExplodables.Where(IsInLOS))
