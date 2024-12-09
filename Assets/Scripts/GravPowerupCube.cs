@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Data;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -14,6 +12,9 @@ public enum PowerupState
 
 public class GravPowerupCube : MonoBehaviour
 {
+    [SerializeField] float powerupTimer;
+    [SerializeField] float timerVariance;
+
     [SerializeField] Material readyMat;
     [SerializeField] Material cdMat;
 
@@ -45,7 +46,8 @@ public class GravPowerupCube : MonoBehaviour
             cdTimer = cdMax;
             mesh.material = cdMat;
             StartCoroutine(EnableVignette());
-            gravManager.StartGravPowerup(10f);
+            float duration = powerupTimer + Random.Range(-timerVariance, timerVariance);
+            gravManager.StartGravPowerup(duration);
         }
 
     }

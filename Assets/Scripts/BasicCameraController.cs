@@ -23,10 +23,6 @@ public class BasicCameraController : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         player.Rotate(Vector3.up * mouseX);
-
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
-        Vector3 targetPosition = player.position;
-        transform.position = targetPosition;
     }
 }

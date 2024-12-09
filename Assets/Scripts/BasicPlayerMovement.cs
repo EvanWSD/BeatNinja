@@ -16,14 +16,17 @@ public class BasicPlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius;
 
+    // boolean states
     bool isGrounded;
-    bool isDashing;
+    public bool isDashing { get; private set; }
     bool isSliding;
 
     // dash
     [SerializeField] DashManager dashManager;
     Collider dashHb;
     float dashSpeed = 75f;
+    float recentDashTimerMax = 0.1f;
+    float recentDashTimer = 0f;
     Vector3 dashDir;
     float maxDashTime = 0.2f;
     float currDashDuration = 0f;
@@ -57,6 +60,7 @@ public class BasicPlayerMovement : MonoBehaviour
     private void Update()
     {
         CheckGrounded();
+        recentDashTimer -= Time.deltaTime;
         if (isDashing)
         {
             MoveInDash();
@@ -116,6 +120,7 @@ public class BasicPlayerMovement : MonoBehaviour
     {
         isDashing = false;
         dashHb.enabled = false;
+        recentDashTimer = recentDashTimerMax;
         Camera.main.fieldOfView = startFov;
         if (hitValidTarget)
         {
@@ -187,6 +192,11 @@ public class BasicPlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Physics.gravity.y), ForceMode.Impulse);
+    }
+
+    public bool RecentlyDashed()
+    {
+        return recentDashTimer >= 0f;
     }
 
     float Sigmoid(float x)

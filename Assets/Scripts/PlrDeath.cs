@@ -4,11 +4,13 @@ using UnityEngine.Events;
 public class PlrDeath : MonoBehaviour
 {
     PlrCheckpointManager cpManager;
+    BasicPlayerMovement movement;
 
     public UnityEvent OnPlayerDeath = new UnityEvent();
 
     private void Start()
     {
+        movement = GetComponent<BasicPlayerMovement>();
         cpManager = GetComponent<PlrCheckpointManager>();
         OnPlayerDeath.AddListener(() =>
         {
@@ -20,7 +22,8 @@ public class PlrDeath : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            if (!GameManager.Global_GodMode) OnPlayerDeath.Invoke();
+            if (!GameManager.Global_GodMode && !movement.RecentlyDashed()) 
+                OnPlayerDeath.Invoke();
         }
     }
 }

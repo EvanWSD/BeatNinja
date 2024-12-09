@@ -100,19 +100,11 @@ public class ShooterEnemy : IDashable
         return false;
     }
 
-    void Shoot(Transform target)
+    protected virtual void Shoot(Transform target)
     {
         EnemyBullet newBullet = Instantiate(bulletPrefab, transform).GetComponent<EnemyBullet>();
         newBullet.transform.SetParent(null);
         Vector3 toTarget = target.transform.position - transform.position;
-        newBullet.SetTrajectory(toTarget);
-    }
-
-    void Shoot(Transform target, Vector3 offset)
-    {
-        EnemyBullet newBullet = Instantiate(bulletPrefab, transform).GetComponent<EnemyBullet>();
-        newBullet.transform.SetParent(null);
-        Vector3 toTarget = target.transform.position - transform.position + offset;
         newBullet.SetTrajectory(toTarget);
     }
 

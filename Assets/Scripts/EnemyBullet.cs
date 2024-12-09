@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
@@ -23,6 +20,8 @@ public class EnemyBullet : MonoBehaviour
     public void SetTrajectory(Vector3 dir, float spd=-1)
     {
         this.dir = dir.normalized;
+        if (spd != -1)
+            this.spd = spd;
     }
 
     private void OnCollisionEnter(Collision collision)

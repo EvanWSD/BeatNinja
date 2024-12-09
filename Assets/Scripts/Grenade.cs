@@ -26,7 +26,6 @@ public class Grenade : IDashable
     [Header("Physic Materials")]
     [SerializeField] PhysicMaterial icePMat;
     [SerializeField] PhysicMaterial bouncePMat;
-    //(grav uses default/None)
 
     Rigidbody rb;
     MeshRenderer mesh;

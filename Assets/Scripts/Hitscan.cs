@@ -11,7 +11,7 @@ public class Hitscan : MonoBehaviour
     [SerializeField] Image reticleImg;
 
     protected void PerformHitscan() {
-        // Define a ray from the center of the camera's viewport (screen center)
+        // ray from screen center
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
         RaycastHit hit;
