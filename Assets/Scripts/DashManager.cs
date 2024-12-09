@@ -6,6 +6,8 @@ public class DashManager : MonoBehaviour
     [SerializeField] LayerMask dashTargetLayers;
     [HideInInspector] public UnityEvent OnGoodDash = new UnityEvent();
 
+    [SerializeField] float checkSphereRadius = 5f;
+
     private void Start()
     {
         GetComponent<Collider>().enabled = false;
@@ -16,11 +18,22 @@ public class DashManager : MonoBehaviour
     {
         if (isOnDashableLayer(other))
         {
-            OnGoodDash.Invoke(); // player
+            OnGoodDash.Invoke();
             if (other.TryGetComponent(out IDashable dashable))
             {
-                dashable.OnDashedInto.Invoke();    
+                dashable.OnDashedInto.Invoke();
+                AlsoDashNearbyEnemies(dashable);
             }
+        }
+    }
+
+    void AlsoDashNearbyEnemies(IDashable dashTarget)
+    {
+        Collider[] nearby = Physics.OverlapSphere(dashTarget.transform.position, checkSphereRadius, dashTargetLayers);
+        foreach(Collider col in nearby)
+        {
+            col.TryGetComponent(out IDashable dashable);
+            dashable?.OnDashedInto.Invoke();
         }
     }
 
@@ -29,5 +42,9 @@ public class DashManager : MonoBehaviour
         return (dashTargetLayers.value & (1 << col.gameObject.layer)) > 0;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        OnTriggerEnter(collision.gameObject.GetComponent<Collider>());
+    }
 
 }

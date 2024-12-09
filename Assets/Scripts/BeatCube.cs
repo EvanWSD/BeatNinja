@@ -24,7 +24,7 @@ public class BeatCube : MonoBehaviour
             if (++cMode > modeParents.Length) cMode = 1;
             cParent.SetActive(false);
             cParent = modeParents[cMode-1];
-            cParent.SetActive(true); // TODO: replace activation with custom event/function for other toggleable stuff
+            cParent.SetActive(true);
         });
     }
 }
