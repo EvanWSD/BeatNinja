@@ -1,8 +1,11 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+
+    public static bool Global_GodMode { get; private set; }
 
     private void Awake()
     {
@@ -14,6 +17,11 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public static void SetGodModeEnabled(bool enabled)
+    {
+        Global_GodMode = enabled;
     }
 
     public static void Quit()

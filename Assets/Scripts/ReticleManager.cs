@@ -20,7 +20,7 @@ public class ReticleManager : MonoBehaviour
 
         maxTTL = BeatsToSecs(maxTTLInBeats);
 
-        BeatManager.OnBeat.AddListener(() =>
+        bm.OnBeat.AddListener(() =>
         {
             CreateNewIndicator(false);
             CreateNewIndicator(true);

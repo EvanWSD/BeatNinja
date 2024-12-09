@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 // on music beats sets material to random color
@@ -10,7 +11,8 @@ public class TestPulseCube : MonoBehaviour
     private void OnEnable()
     {
         mat = GetComponent<MeshRenderer>().material;
-        BeatManager.OnBeat.AddListener(() =>
+        bm = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
+        bm.OnBeat.AddListener(() =>
         {
             float r = Random.Range(0, 100) / 100f;
             float g = Random.Range(0, 100) / 100f;

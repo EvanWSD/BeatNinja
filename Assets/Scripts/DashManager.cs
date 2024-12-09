@@ -22,7 +22,10 @@ public class DashManager : MonoBehaviour
             if (other.TryGetComponent(out IDashable dashable))
             {
                 dashable.OnDashedInto.Invoke();
-                AlsoDashNearbyEnemies(dashable);
+                if (!dashable.CompareTag("Enemy"))
+                {
+                    AlsoDashNearbyEnemies(dashable);
+                }
             }
         }
     }

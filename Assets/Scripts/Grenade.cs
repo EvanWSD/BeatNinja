@@ -31,6 +31,7 @@ public class Grenade : IDashable
     Rigidbody rb;
     MeshRenderer mesh;
     Collider col;
+    BeatManager beat;
 
     void Awake()
     {
@@ -42,10 +43,11 @@ public class Grenade : IDashable
         rb = GetComponent<Rigidbody>();
         mesh = GetComponent<MeshRenderer>();
         col = GetComponent<Collider>();
+        beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
 
         ApplyModeChanges(mode);
 
-        BeatManager.OnBeat.AddListener(() =>
+        beat.OnBeat.AddListener(() =>
         {
             beatsLeft -= 1;
             if (beatsLeft <= 0 && !isExploding)
@@ -101,7 +103,7 @@ public class Grenade : IDashable
 
     void FixedUpdate()
     {
-        mesh.material = BeatManager.IsCalledNearBeat(0.1f) ? beepMat : normalMat;
+        mesh.material = beat.IsCalledNearBeat(0.1f) ? beepMat : normalMat;
     }
 
     public IEnumerator Explode()

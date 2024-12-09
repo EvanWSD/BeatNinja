@@ -4,7 +4,6 @@ using UnityEngine.Events;
 public class PlrDeath : MonoBehaviour
 {
     PlrCheckpointManager cpManager;
-    [SerializeField] bool godMode;
 
     public UnityEvent OnPlayerDeath = new UnityEvent();
 
@@ -21,7 +20,7 @@ public class PlrDeath : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            if (!godMode) OnPlayerDeath.Invoke();
+            if (!GameManager.Global_GodMode) OnPlayerDeath.Invoke();
         }
     }
 }

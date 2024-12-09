@@ -23,13 +23,19 @@ public class PlayerBow : MonoBehaviour
     [SerializeField] Image reticleImg;
 
     [SerializeField] GameObject bowObj;
+
     float baseScale;
     [SerializeField] float maxScaleDelta;
 
+    BeatManager beat;
+
     void Start()
     {
+        beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
+
         state = BowState.None;
         baseScale = bowObj.transform.localScale.x;
+
     }
 
     void Update()
@@ -42,11 +48,11 @@ public class PlayerBow : MonoBehaviour
                 {
                     state = BowState.Pulling;
                     currPullBeats = 0;
-                    beatNumWhenStarted = BeatManager.beatNumLerp;
+                    beatNumWhenStarted = beat.beatNumLerp;
                 } 
                 break;
             case BowState.Pulling:
-                currPullBeats = BeatManager.beatNumLerp - beatNumWhenStarted;
+                currPullBeats = beat.beatNumLerp - beatNumWhenStarted;
                 LerpBowScale();
                 if (Input.GetMouseButtonUp(0))
                 {
@@ -90,7 +96,7 @@ public class PlayerBow : MonoBehaviour
     void AttemptShot(RaycastHit target)
     {
         state = BowState.None;
-        if (BeatManager.IsCalledNearBeat())
+        if (beat.IsCalledNearBeat())
         {
             if (currPullBeats >= minPullBeats && lookingAtShootable)
             {

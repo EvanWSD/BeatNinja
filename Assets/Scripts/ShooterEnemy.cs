@@ -25,6 +25,7 @@ public class ShooterEnemy : IDashable
     [SerializeField] GameObject bulletPrefab;
 
     LevelManager level;
+    BeatManager beat;
 
     public UnityEvent OnExploded = new UnityEvent();
     public UnityEvent OnDefeated = new UnityEvent();
@@ -33,15 +34,16 @@ public class ShooterEnemy : IDashable
     {
         player = GameObject.FindGameObjectWithTag("Player");
         level = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
+        beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
 
         shootState = ShootState.OnCooldown;
         ResetShootCooldown();
 
         if (beatCooldown <= 0) beatCooldown = 4;
 
-        BeatManager.OnBeat.AddListener(() =>
+        beat.OnBeat.AddListener(() =>
         {
-            if (BeatManager.beatNum % beatCooldown == 0 && PlayerInDetectionRange() && CanSeePlayer())
+            if (beat.beatNum % beatCooldown == 0 && PlayerInDetectionRange() && CanSeePlayer())
             {
                 Shoot(player.transform);
                 shootState = ShootState.OnCooldown;

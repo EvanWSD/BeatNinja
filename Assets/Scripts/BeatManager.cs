@@ -5,24 +5,23 @@ using UnityEngine.Events;
 // Manages the timing of code to the beat of the music (using manually input bpm)
 public class BeatManager : MonoBehaviour
 {
-    // ven 105f?
     public float bpm { get; private set; } = 115f ;
 
     [SerializeField] AudioSource musicSource;
 
     [Tooltip("+- beat progression for which timed inputs count as 'pressed on a beat'")]
-    [SerializeField] static float validBeatInputVariance = 0.2f;
+    [SerializeField] float validBeatInputVariance = 0.2f;
 
     float speedMult = 1f;
-    public static float beatNum = 1;
-    public static float beatNumLerp;
-    public static float currentBeatProgress01;
+    public float beatNum = 1;
+    public float beatNumLerp;
+    public float currentBeatProgress01;
     float timeSinceLastBeat = 0f;
     float timeOfLastBeat=0f;
     public float secsPerBeat { get; private set; }
     const float syncFix = 0.1f; // AudioSources in Unity have a slight unavoidable delay
     
-    public static UnityEvent OnBeat = new UnityEvent();
+    public UnityEvent OnBeat = new UnityEvent();
     public UnityEvent OnNewMusic = new UnityEvent();
 
     void Start()
@@ -58,11 +57,10 @@ public class BeatManager : MonoBehaviour
 
     // used to gauge whether inputs are done in time with the music
     // greater variance means stricter timing
-    public static bool IsCalledNearBeat(float variance=-1)
+    public bool IsCalledNearBeat(float variance=-1)
     {
-        if (variance == -1)
-            variance = BeatManager.validBeatInputVariance;
-        return (currentBeatProgress01 <= variance || currentBeatProgress01 >= 1-variance);
+        if (variance == -1) variance = validBeatInputVariance;
+        return currentBeatProgress01 <= variance || currentBeatProgress01 >= 1-variance;
     }
 
 
@@ -74,7 +72,8 @@ public class BeatManager : MonoBehaviour
         musicSource.clip = newMusic;
         musicSource.Stop();
         musicSource.Play();
-        beatNum = 0f;
+        beatNum = 1;
+        OnBeat.Invoke();
     }
 
     public float CalcSecsPerBeat()

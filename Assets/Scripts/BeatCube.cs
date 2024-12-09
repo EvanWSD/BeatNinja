@@ -10,6 +10,7 @@ public class BeatCube : MonoBehaviour
 
     void Start()
     {
+        bm = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
         cParent = modeParents[modeParents.Length-1];
         foreach (GameObject obj in modeParents)
         {
@@ -19,7 +20,7 @@ public class BeatCube : MonoBehaviour
 
     void OnEnable()
     {
-        BeatManager.OnBeat.AddListener(() =>
+        bm.OnBeat.AddListener(() =>
         {
             if (++cMode > modeParents.Length) cMode = 1;
             cParent.SetActive(false);

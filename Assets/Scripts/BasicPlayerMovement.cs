@@ -6,6 +6,7 @@ public class BasicPlayerMovement : MonoBehaviour
 {
     Rigidbody rb;
     PlayerInput playerInput;
+    BeatManager beat;
 
     public float moveSpeed;
     public float walkAcc = 5f;
@@ -48,6 +49,7 @@ public class BasicPlayerMovement : MonoBehaviour
         dashManager.OnGoodDash.AddListener(() => EndDash(true));
         dashHb = dashManager.GetComponent<Collider>();
         col = GetComponent<Collider>();
+        beat = GameObject.FindGameObjectWithTag("BeatManager").GetComponent<BeatManager>();
 
         startFov = Camera.main.fieldOfView;
     }
@@ -74,7 +76,7 @@ public class BasicPlayerMovement : MonoBehaviour
 
     void AbilityCheck()
     {
-        if (playerInput.dashInp && !isDashing && BeatManager.IsCalledNearBeat())
+        if (playerInput.dashInp && !isDashing && beat.IsCalledNearBeat())
         {
             BeginDash();
         }
