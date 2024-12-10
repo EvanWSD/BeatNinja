@@ -17,6 +17,12 @@ public class LevelStateEscape : ILevelState
     public override void Enter()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        player.GetComponent<PlrDeath>().OnPlayerDeath.AddListener(() => 
+        { 
+            escapeTimer = timeToEscapeMax;
+
+        });
+
         escapeTimer = timeToEscapeMax;
         UI = GameObject.FindGameObjectWithTag("EscapeSectionUI");
         UI.SetActive(true);

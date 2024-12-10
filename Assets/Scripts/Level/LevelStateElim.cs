@@ -8,6 +8,8 @@ public class LevelStateElim : ILevelState
     int numElimsTarget;
     TextMeshProUGUI elimCounterText;
 
+    PlrDeath player;
+
     public UnityEvent OnEnemyElim = new UnityEvent();
 
     public LevelStateElim(int numElimsTarget = 10) {
@@ -22,6 +24,13 @@ public class LevelStateElim : ILevelState
             numElims++;
             ResetUI();
         });
+
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlrDeath>();
+        player.OnPlayerDeath.AddListener(() => { 
+            numElims = 0;
+            ResetUI();
+        });
+
 
         UI = GameObject.FindGameObjectWithTag("ElimSectionUI");
         UI.SetActive(true);

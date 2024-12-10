@@ -1,6 +1,4 @@
-using System.Collections.Specialized;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class BasicPlayerMovement : MonoBehaviour
 {
@@ -23,6 +21,7 @@ public class BasicPlayerMovement : MonoBehaviour
 
     // dash
     [SerializeField] DashManager dashManager;
+    bool canDash;
     Collider dashHb;
     float dashSpeed = 75f;
     float recentDashTimerMax = 0.1f;
@@ -80,7 +79,7 @@ public class BasicPlayerMovement : MonoBehaviour
 
     void AbilityCheck()
     {
-        if (playerInput.dashInp && !isDashing && beat.IsCalledNearBeat())
+        if (canDash && playerInput.dashInp && !isDashing && beat.IsCalledNearBeat())
         {
             BeginDash();
         }
@@ -89,6 +88,7 @@ public class BasicPlayerMovement : MonoBehaviour
     void BeginDash()
     {
         isDashing = true;
+        canDash = false;
         dashHb.enabled = true;
         dashDir = Camera.main.transform.forward;
         currDashDuration = 0f;
@@ -127,6 +127,7 @@ public class BasicPlayerMovement : MonoBehaviour
             rb.velocity = new Vector3(rb.velocity.x, goodDashImpulseMag, rb.velocity.z); 
             doubleJumpAvailable = true;
             doubleJumpTimer = doubleJumpTimerMax;
+            canDash = true;
         }
         else
         {
@@ -167,6 +168,7 @@ public class BasicPlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             doubleJumpAvailable = true;
+            canDash = true;
         }
         else // in air
         {

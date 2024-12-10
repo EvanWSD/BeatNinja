@@ -7,6 +7,8 @@ public class LevelStateButton : ILevelState
     [SerializeField] int numButtonsTarget;
     int numButtonsHit = 0;
 
+    PlrDeath player;
+
     TextMeshProUGUI buttonsHitText;
 
     public UnityEvent OnLvlButtonHit = new UnityEvent();
@@ -21,6 +23,12 @@ public class LevelStateButton : ILevelState
         numButtonsHit = 0;
         OnLvlButtonHit.AddListener(() => {
             numButtonsHit++;
+            UpdateUI();
+        });
+
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlrDeath>();
+        player.OnPlayerDeath.AddListener(() => { 
+            numButtonsHit = 0;
             UpdateUI();
         });
 

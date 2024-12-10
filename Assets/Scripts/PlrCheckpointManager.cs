@@ -16,7 +16,7 @@ public class PlrCheckpointManager : MonoBehaviour
 
     public bool TryNewCheckpoint(Checkpoint cp)
     {
-        if (cp.checkpointIndex >= currCpNum)
+        if (cp.checkpointIndex > currCpNum)
         {
             currCpNum = cp.checkpointIndex;
             lastCp = cp.transform;

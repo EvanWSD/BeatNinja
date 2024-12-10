@@ -43,7 +43,7 @@ public class ShooterEnemy : IDashable
 
         beat.OnBeat.AddListener(() =>
         {
-            if (beat.beatNum % beatCooldown == 0 && PlayerInDetectionRange() && CanSeePlayer())
+            if (gameObject.activeSelf && beat.beatNum % beatCooldown == 0 && PlayerInDetectionRange() && CanSeePlayer())
             {
                 Shoot(player.transform);
                 shootState = ShootState.OnCooldown;
@@ -110,7 +110,7 @@ public class ShooterEnemy : IDashable
 
     void Die()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     private void OnDrawGizmos()
